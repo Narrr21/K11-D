@@ -1,12 +1,21 @@
+import os
+
 class YesOrNo:
     def __init__(self, YN):
         while True:
             if YN != "Y" and YN != "N":
                 print("Masukan yang valid hanya Y atau N")
                 YN = input("<///> Y/N: ")
+                os.system('cls')
             else:
                 break
         self.YN = YN
+
+def display(text:str):
+    print(f"""
+<==================================================================================>
+{text}
+<==================================================================================>""")
 
 def laboratory():
     # SPESIFIKASI
@@ -48,6 +57,7 @@ def pilihMonster() -> int:
     # ALGORITMA
     while True:
         pilihan = int(input("<///> Pilih monster: "))
+        os.system('cls')
         if pilihan in range(1, 5):#5 adalah placeholder untuk panjang list monster
             level:int = 2 #placeholder untuk level monster
             if level == 5:
@@ -68,15 +78,18 @@ def upgrade(monsterId:int) -> bool:
     namaMonster:str = "Chacha" #placeholder nama monster
     level:int = 2 #placeholder untuk level monster
     hargaUpgrade:int = 300 #placeholder untuk biaya upgrade
-    print(f'{namaMonster} akan di-upgrade ke level {level + 1}')
-    print(f'Harga untuk melakukan upgrade {namaMonster} adalah {hargaUpgrade} OC.')
+    display(
+f"""{namaMonster} akan di-upgrade ke level {level + 1}
+Harga untuk melakukan upgrade {namaMonster} adalah {hargaUpgrade} OC""")
     isUpgrade = YesOrNo(input("<///> Lanjutkan upgrade (Y/N): "))
+    os.system("cls")
     if isUpgrade.YN == "Y":
         #merubah data csv monster_inventory dan oc user
-        print(f'Selamat, {namaMonster} berhasil di-upgrade ke level {level + 1} !')
+        display(f'Selamat, {namaMonster} berhasil di-upgrade ke level {level + 1} !')
         return True
     elif isUpgrade.YN == "N" :
         return False
 
+laboratory()
 
 
