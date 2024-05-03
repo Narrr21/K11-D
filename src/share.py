@@ -30,3 +30,41 @@ def pilihMonster() -> int:
             return pilihan
         else:
             print("pilihan tidak tersedia!")
+
+def split(baris:str, pemisah:str=None):
+    if pemisah is None:
+        pemisah = " "
+    hasil = []
+    temp = ""
+    for char in baris:
+        if char != pemisah:
+            temp += char
+        else:
+            hasil.append(temp)
+            temp = ""
+    hasil.append(temp[:-1])
+    return hasil
+
+def splitcsv(file:list):
+    hasil:list = []
+    for line in file:
+        row = list(split(line, ";"))
+        hasil.append(row)
+    return hasil
+
+def monsterInventory() -> list:
+    with open(r'data\monster_inventory.csv', 'r') as file:
+        return splitcsv(file)
+
+def monsterList(userId:int) -> list:
+    data = monsterInventory()
+    hasil = search(0, str(userId), data)
+    return hasil
+
+def search(searchIndex:int, searchInput, file:list) -> list:
+    hasil = []
+    for row in file:
+        if searchInput == row[searchIndex]:
+            hasil.append(row)
+    return hasil
+
