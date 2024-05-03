@@ -14,7 +14,7 @@ def laboratory():
     while not selesai:
         labMenu()
         exit = YesOrNo(input("<///> Keluar (Y/N): "))
-        if exit.YN == "Y":
+        if exit == "Y":
             break
         monsterId:int = pilihMonster()
         selesai = upgrade(monsterId)
@@ -67,11 +67,11 @@ f"""{namaMonster} akan di-upgrade ke level {level + 1}
 Harga untuk melakukan upgrade {namaMonster} adalah {hargaUpgrade} OC""")
     isUpgrade = YesOrNo(input("<///> Lanjutkan upgrade (Y/N): "))
     os.system("cls")
-    if isUpgrade.YN == "Y":
+    if isUpgrade == "Y":
         #merubah data csv monster_inventory dan oc user
         display(f'Selamat, {namaMonster} berhasil di-upgrade ke level {level + 1} !')
         return True
-    elif isUpgrade.YN == "N" :
+    elif isUpgrade == "N" :
         return False
 
 laboratory()
