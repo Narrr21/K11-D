@@ -16,3 +16,17 @@ def display(text:str):
 <==================================================================================>
 {text}
 <==================================================================================>""")
+
+def pilihMonster() -> int:
+    # SPESIFIKASI
+    # Melakukan loop hingga valid untuk menghasilkan pilihan monster yang ingin diupgrade
+    # KAMUS
+    # pilihan, level = int
+    # ALGORITMA
+    while True:
+        pilihan = int(input("<///> Pilih monster: "))
+        os.system('cls')
+        if 0 < pilihan < 5:#5 adalah placeholder untuk panjang list monster
+            return pilihan
+        else:
+            print("pilihan tidak tersedia!")
