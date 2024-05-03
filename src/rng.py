@@ -35,6 +35,6 @@ class LCGPseudoRandomGenerator :
         if numRange is None: #saat tidak dimasukkan daerah hasil yang diinginkan
             return self.x_prev
         else:
-            return int((self.x_prev / (self.m - 1)) * (numRange[1] - numRange[0]) + numRange[0])
+            return int((self.x_prev / (self.m - 1)) * (numRange[1]+1 - numRange[0]) + numRange[0])
 
 random = LCGPseudoRandomGenerator()

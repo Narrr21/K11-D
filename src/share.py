@@ -23,8 +23,7 @@ def get_stats(id:int, level:int) -> dict:
 
 
 def display(text:str):
-    print(f"""
-<==================================================================================>
+    print(f"""<==================================================================================>
 {text}
 <==================================================================================>""")
 
@@ -73,6 +72,9 @@ def splitcsv(file:list) -> list:
 def monsterInventory() -> list:
     with open(r'data\monster_inventory.csv', 'r') as file:
         return splitcsv(file)
+def potionInventory() -> list:
+    with open(r'data\item_inventory.csv', 'r') as file:
+        return splitcsv(file)
 
 def dataMonster() -> list:
     with open(r'data\monster.csv', 'r') as file:
@@ -90,6 +92,30 @@ def monsterList(userId:int) -> list:
     for i in range(len(hasil)):
         monsterId = int(hasil[i][1])
         print(f"{i+1}. {statMonster(monsterId, 1)}")
+
+def potionList(userId:int) -> int:
+    data = potionInventory()
+    hasil = search(0, str(userId), data)
+    print("<============> POTION LIST <============>")
+    number = 0
+    for potion in hasil:
+        number += 1
+        print(f"{number}. {potion[1]} Potion (Qty: {potion[2]})", end="")
+        if potion[1] == "strength":
+            print(" - Increase ATK Power")
+        elif potion[1] == "resilience":
+            print(" - Increase DEF Power")
+        elif potion[1] == "healing":
+            print(" - Restore Health")
+        else: 
+            print()
+    return number
+
+def potionStatus(userId:int):
+    data = potionInventory()
+    hasil = search(0, str(userId), data)
+    status = [[potion[1], 0] for potion in hasil]
+    return status
 
 def search(searchIndex:int, searchInput:str, file:list) -> list:
     hasil = []
