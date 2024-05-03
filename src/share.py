@@ -1,15 +1,13 @@
 import os
 
-class YesOrNo:
-    def __init__(self, masukan:str) -> str:
-        while True:
-            if masukan != "Y" and masukan != "N":
-                print("Masukan yang valid hanya Y atau N")
-                masukan = input("<///> Y/N: ")
-                os.system('cls')
-            else:
-                break
-        self.YN = masukan
+def YesOrNo (masukan:str) -> str:
+    while True:
+        if masukan != "Y" and masukan != "N":
+            print("Masukan yang valid hanya Y atau N")
+            masukan = input("<///> Y/N: ")
+            os.system('cls')
+        else:
+            return masukan
 
 def get_stats(id:int, level:int) -> dict:
     stat = {

@@ -1,57 +1,64 @@
 import os
-from share import YesOrNo,display
+from share import YesOrNo,display, monsterList, level, get_stats, monsterInventory, search, statMonster
 
 def laboratory():
     # SPESIFIKASI
     # Menjalankan laboratory agar pemain dapat mengupgrade monsternya
     # selesai saat monster sudah diupgrade atau user memilih untuk keluar
     # KAMUS
-    # selesai = boolean
     # exit = YesOrNo
     # monsterId = int
     # ALGORITMA
-    selesai:bool = False
-    while not selesai:
-        labMenu()
+    os.system("cls")
+    while True:
+        userId = 3 #Placeholder
+        labMenu(userId)
+        data:list = pilihMonsterLab(userId)
+        monsterId = data[0]
+        levelMonster = data[1]
+        upgrade(monsterId, levelMonster)
         exit = YesOrNo(input("<///> Keluar (Y/N): "))
         if exit == "Y":
             break
-        monsterId:int = pilihMonster()
-        selesai = upgrade(monsterId)
 
-def labMenu():
+def labMenu(userId:int):
     # SPESIFIKASI
     # Menampilkan interface lab dengan list Monster dan list harga
     # KAMUS
     # AlGORITMA
-    print("""
-Selamat datang di Lab Dokter Asep !!!
-                  
-<============> MONSTER LIST <============>""")
-    print("monster")#placeholder tampilan list monster
-    print("""
-<============> UPGRADE PRICE <============>""")
-    print("harga")#placeholder tampilan list harga
+    print("Selamat datang di Lab Dokter Asep !!!")
+    monsterList(userId)
+    print(
+"""<============> UPGRADE PRICE <============>
+1. Level 1 -> Level 2: 300 OC
+2. Level 2 -> Level 3: 500 OC
+3. Level 3 -> Level 4: 800 OC
+4. Level 4 -> Level 5: 1000 OC""")
 
-def pilihMonster() -> int:
+def pilihMonsterLab(userId:int) -> int:
     # SPESIFIKASI
     # Melakukan loop hingga valid untuk menghasilkan pilihan monster yang ingin diupgrade
     # KAMUS
     # pilihan, level = int
     # ALGORITMA
+    data = monsterInventory()
+    hasil = search(0, str(userId), data)
     while True:
         pilihan = int(input("<///> Pilih monster: "))
         os.system('cls')
-        if pilihan in range(1, 5):#5 adalah placeholder untuk panjang list monster
-            level:int = 2 #placeholder untuk level monster
-            if level == 5:
-                print("Maaf monster yang Anda pilih sudah memiliki level maksimum")
-            else:
-                return pilihan
+        if 0 < pilihan < len(hasil)+1:
+            levelMonster = level(userId, hasil[pilihan-1][1])
+        else:
+            levelMonster = 10
+        
+        if levelMonster == 5:
+            print("max level")
+        elif 0 < pilihan < len(hasil)+1:
+            return [hasil[pilihan-1][1], levelMonster]
         else:
             print("pilihan tidak tersedia!")
 
-def upgrade(monsterId:int) -> bool:
+def upgrade(monsterId:int, levelMonster:int):
     # SPESIFIKASI
     # Melakukan upgrade monster yang dipilih dengan id adalah monsterId
     # upgrade akan menambahkan 1 level pada monster dan mengurangi oc user sesuai biayanya
@@ -59,20 +66,25 @@ def upgrade(monsterId:int) -> bool:
     # namaMonster = string
     # level, namaMonster, hargaUpgrade = int
     # isUpgrade = YesOrNo
-    namaMonster:str = "Chacha" #placeholder nama monster
-    level:int = 2 #placeholder untuk level monster
-    hargaUpgrade:int = 300 #placeholder untuk biaya upgrade
+    
+    statMonster = get_stats(monsterId, levelMonster)
+    namaMonster:str = statMonster["Name"] 
+    if levelMonster == 1:
+        hargaUpgrade = 300
+    elif levelMonster == 2:
+        hargaUpgrade = 500
+    elif levelMonster == 3:
+        hargaUpgrade = 800
+    elif levelMonster == 4:
+        hargaUpgrade = 1000
     display(
-f"""{namaMonster} akan di-upgrade ke level {level + 1}
+f"""{namaMonster} akan di-upgrade ke level {levelMonster + 1}
 Harga untuk melakukan upgrade {namaMonster} adalah {hargaUpgrade} OC""")
     isUpgrade = YesOrNo(input("<///> Lanjutkan upgrade (Y/N): "))
     os.system("cls")
     if isUpgrade == "Y":
         #merubah data csv monster_inventory dan oc user
-        display(f'Selamat, {namaMonster} berhasil di-upgrade ke level {level + 1} !')
-        return True
-    elif isUpgrade == "N" :
-        return False
+        display(f'Selamat, {namaMonster} berhasil di-upgrade ke level {levelMonster + 1} !')
 
 laboratory()
 
