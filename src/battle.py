@@ -1,10 +1,10 @@
 import os
 import time
 from rng import random
-from share import pilihMonster, level, get_stats,display,potionList, potionStatus
+from share import pilihMonster, level, get_stats,display,potionList, potionStatus, readcsv, clear, pilihanValid
 
 def battle() -> bool:
-    os.system("cls")
+    clear()
     hasil = 0
     userId = 3 #Placeholder
     namaUser = "x" #placeholder
@@ -15,7 +15,7 @@ def battle() -> bool:
     status = potionStatus(userId)
     maxHpMusuh = statMusuh["Hp"]
     maxHpAgent = statAgent["Hp"]
-    os.system("cls")
+    clear()
     while hasil == 0:
         ronde += 1
         isEscape = turn(ronde, userId, statAgent, statMusuh, status, maxHpMusuh, maxHpAgent)
@@ -79,7 +79,10 @@ r"""                                ___.
     
 
 def encounter(userId:int, namaUser:str) -> list:
-    statMusuh = musuh()
+    banyakMonster = len(readcsv("monster"))
+    idMusuh = random(numRange=[1,banyakMonster])
+    levelMusuh = random(numRange=[1,5])
+    statMusuh = get_stats(idMusuh, levelMusuh)
     print(
 r"""           _.------.                        .----.__
            /         \_.       ._           /---.__  \
@@ -124,12 +127,6 @@ r"""
     time.sleep(5)
     return [statAgent, statMusuh]
 
-def musuh()-> dict:
-    idMusuh = random.generate((1,5))
-    levelMusuh = random.generate((1,5))
-    statMusuh = get_stats(idMusuh, levelMusuh)
-    return statMusuh
-
 def showStat(stat:dict, maxHp:int=None) -> str:
     if maxHp is None:
         maxHp = stat["Hp"]
@@ -138,9 +135,9 @@ f"""Name      : {stat["Name"]}
 ATK Power : {stat["Atk"]}
 DEF Power : {stat["Def"]}
 HP        : {stat["Hp"]}/{maxHp}
-Level      : {stat["Level"]}""")
+Level     : {stat["Level"]}""")
 
-def turn(number:int, userId:int, allies:dict, enemies:dict, status:list, maxHpMusuh:int, maxHpAgent:int, agent:bool=True) -> bool:
+def turn(number:int, userId:int, allies:dict, enemies:dict, status:list, maxHpMusuh:int, maxHpAgent:int, valid=True, agent:bool=True) -> bool:
     if agent:
         while True:
             showStat(enemies, maxHpMusuh)
@@ -151,11 +148,11 @@ f"""<============> Turn {number} ({allies["Name"]}) <============>
 1. Attack
 2. Use Potion
 3. Escape""")
-            pilihan = int(input("<///> Pilih perintah: "))
+            pilihan = pilihanValid(input("<///> Pilih perintah: "), ["1", "2", "3"])
             if pilihan in [1, 2, 3]:
                 if pilihan == 1:
                     attack(allies["Atk"], enemies["Def"], allies["Name"], enemies["Name"], enemies)
-                    os.system("cls")
+                    clear()
                     return False
                 elif pilihan == 2:
                     nomor = potionList(userId)
@@ -163,25 +160,26 @@ f"""<============> Turn {number} ({allies["Name"]}) <============>
                     isCancel = usePotion(status, nomor, allies, maxHpAgent)
                     if isCancel:
                         continue
-                    os.system("cls")
+                    clear()
                     return False
                 else:
-                    os.system("cls")
+                    clear()
                     return True
             else:
-                print("pilihan tidak tersedia!")
+                clear()
+
     else:
         showStat(enemies, maxHpMusuh)
         print("                                         VS                                         ")
         showStat(allies, maxHpAgent)
         print(f"<============> Turn {number} ({enemies["Name"]}) <============>")
         attack(enemies["Atk"], allies["Def"], enemies["Name"], allies["Name"], allies)
-        os.system("cls")
+        clear()
 
 def attack(Atk:int, Def:int, attackerName:str, defenderName:str, defender:list):
     lowATK = int(Atk * 7/10)
     highATK = int(Atk * 13/10)
-    rngATK = random.generate((lowATK, highATK))
+    rngATK = random(numRange=[lowATK, highATK])
     DEF = rngATK * (Def/100)
     damage = int(rngATK - DEF)
     print(f"{attackerName} attack {defenderName} dealing {damage} damage !!!")
@@ -192,10 +190,10 @@ def attack(Atk:int, Def:int, attackerName:str, defenderName:str, defender:list):
 
 def usePotion(status:list, number:int, allies:dict, maxHp:int):
     while True:
-        pilihan = int(input("<///> Pilih potion: "))
+        pilihan = pilihanValid(input("<///> Pilih potion: "), [f'{i+1}' for i in range(number+1)])
         if pilihan in range(1, number+2):
             if pilihan-1 == len(status):
-                os.system("cls")
+                clear()
                 return True
             elif status[pilihan-1][1] == 1:
                 print("sudah digunakan")

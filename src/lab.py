@@ -1,5 +1,5 @@
 import os
-from share import YesOrNo,display, monsterList, level, get_stats, monsterInventory, search, statMonster
+from share import YesOrNo, display, monsterList, level, get_stats, search, readcsv
 
 def laboratory():
     # SPESIFIKASI
@@ -41,7 +41,7 @@ def pilihMonsterLab(userId:int) -> int:
     # KAMUS
     # pilihan, level = int
     # ALGORITMA
-    data = monsterInventory()
+    data = readcsv("monster_inventory")
     hasil = search(0, str(userId), data)
     while True:
         pilihan = int(input("<///> Pilih monster: "))
