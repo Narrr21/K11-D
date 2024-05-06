@@ -1,5 +1,4 @@
-from share import pilihanValid, readcsv, YesOrNo, clear, display, isDigit
-import time
+from share import pilihanValid, readcsv, YesOrNo, clear, display, isDigit, sleep
 
 def monsterManangement():
     while True:
@@ -19,6 +18,8 @@ SELAMAT DATANG DI DATABASE PARA MONSTER !!!
                 if newMonster[0]:
                     print("menambahkan ke database monster") #placeholder
                     ...
+                else:
+                    break
             isKeluar = YesOrNo(input("<///> Keluar (Y/N): "))
             if isKeluar:
                 break
@@ -68,7 +69,7 @@ def buatMonster(data:dict):
     namaMonster = data["Type"]
     while True:
         display("Memulai pembuatan Monster...")
-        time.sleep(2)
+        sleep(2)
         nama = input("Masukkan Type / Nama : ")
         if nama in namaMonster:
             print("Nama sudah terdaftar, coba lagi!")
@@ -77,7 +78,7 @@ def buatMonster(data:dict):
             DEF = inputDEF()
             HP = isDigit(input("Masukkan HP : "))
             print("Sedang membuat monster...")
-            time.sleep(3)
+            sleep(3)
             clear()
             display(
 f"""Monster baru berhasil dibuat!

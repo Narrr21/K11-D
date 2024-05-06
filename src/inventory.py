@@ -1,15 +1,18 @@
 from battle import showStat
-from share import clear, display, pilihanValid, readcsv, search, level, get_stats, YesOrNo
+from share import clear, display, pilihanValid, readcsv, search, level, YesOrNo
+from monster import get_stats, getMonsterUser
 
 def inventory(userId:int):
     while True:
         clear()
-        print(f"<=========> Inventory List (User ID : {userId})<==========>")
-        inventMonster = readcsv("monster_inventory")
+
+        # memanggil data monster, monster_inventory dan mencari user yang sesuai
         dataMonster = readcsv("monster")
-        monsterUser = search(0, str(userId), inventMonster)
+        monsterUser = getMonsterUser(userId)
         inventMonsterUser = []
         dataStatMonster = []
+
+        # mwmbuat data string monster dan data stat
         for monster in monsterUser:
             monsterId:int = int(monster[1])
             dataMonsterUser = search(0, str(monsterId), dataMonster)
@@ -20,10 +23,14 @@ def inventory(userId:int):
             inventMonsterUser.append(hasil)
             stat = get_stats(monsterId, levelMonster)
             dataStatMonster.append(stat)
+
+        # memanggil data potion dari item_inventory dan memanggil data dengan user yang sesuai
         inventPotion = readcsv("item_inventory")
         potionUser = search(0, str(userId), inventPotion)
         inventPotionUser = []
         dataPotion = []
+
+        # membuat data string potion dan data potion
         for potion in potionUser:
             potionType = potion[1]
             if potionType == "strength":
@@ -38,6 +45,9 @@ def inventory(userId:int):
         for i in inventPotionUser[1:]:
             inventMonsterUser.append(i)
         invent = inventMonsterUser[1:]
+
+        # Menampilkan hasil ke terminal
+        print(f"<=========> Inventory List (User ID : {userId})<==========>")
         for barang in enumerate(invent):
             print(f"{barang[0]+1}. {barang[1]}")
         nomor = len(invent)

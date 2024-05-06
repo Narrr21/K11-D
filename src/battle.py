@@ -1,6 +1,6 @@
-import time
 from rng import random
-from share import pilihMonster, level, get_stats,display,potionList, search, readcsv, clear, pilihanValid
+from share import level, display,potionList, search, readcsv, clear, pilihanValid, sleep
+from monster import get_stats, pilihMonster
 
 def battle() -> bool:
     clear()
@@ -123,7 +123,7 @@ r"""
     print(f"RAWRR, Agent {namaUser} mengeluarkan monster {statAgent["Name"]} !!!")
     showStat(statAgent)
     print("Entering Battle...")
-    time.sleep(5)
+    sleep(3)
     return [statAgent, statMusuh]
 
 def showStat(stat:dict, maxHp:int=None) -> str:
@@ -184,7 +184,7 @@ def attack(Atk:int, Def:int, attackerName:str, defenderName:str, defender:list):
     defender["Hp"] -= damage
     if defender["Hp"] < 0:
         defender["Hp"] = 0
-    time.sleep(3)
+    sleep(3)
 
 def usePotion(status:list, number:int, allies:dict, maxHp:int):
     while True:
@@ -207,7 +207,7 @@ def usePotion(status:list, number:int, allies:dict, maxHp:int):
                     if allies["Hp"] > maxHp:
                         allies["Hp"] = maxHp
                 status[pilihan-1][1] = 1
-                time.sleep(3)
+                sleep(3)
                 return False
         else:
             print("pilihan tidak tersedia!")

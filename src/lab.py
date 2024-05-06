@@ -1,4 +1,3 @@
-import os
 from share import YesOrNo, display, monsterList, level, search, readcsv, pilihanValid, clear
 from monster import get_stats
 

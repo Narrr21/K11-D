@@ -1,5 +1,5 @@
 import os
-from monster import monsterList
+import time
 
 def YesOrNo(masukan:str) -> str:
     masukan = str.upper(masukan)
@@ -37,24 +37,6 @@ def display(text:str):
 {text}
 <==================================================================================>""")
 
-def pilihMonster(userId:int, withList:bool=False) -> int:
-    # SPESIFIKASI
-    # Melakukan loop hingga valid untuk menghasilkan pilihan monster yang ingin diupgrade
-    # KAMUS
-    # pilihan, level = int
-    # ALGORITMA
-    data = readcsv("monster_inventory")
-    hasil = search(0, str(userId), data)
-    if withList:
-        monsterList(userId)
-    while True:
-        pilihan = pilihanValid(input("<///> Pilih monster: "), [f'{i+1}' for i in range(len(data))])
-        clear()
-        if 0 < pilihan < len(hasil)+1:
-            return hasil[pilihan-1][1]
-        else:
-            print("pilihan tidak tersedia!")
-
 def split(baris:str, pemisah:str=None) -> list:
     if pemisah is None:
         pemisah = " "
@@ -79,6 +61,9 @@ def readcsv(fileName:str) -> list[list[str]]:
 
 def clear():
     os.system("cls")
+
+def sleep(waktu:int=2):
+    time.sleep(waktu)
 
 def potionList(userId:int) -> int:
     data = readcsv("item_inventory")
