@@ -17,8 +17,8 @@ def laboratory():
         monsterId = data[0]
         levelMonster = data[1]
         upgrade(monsterId, levelMonster)
-        exit = YesOrNo(input("<///> Keluar (Y/N): "))
-        if exit == "Y":
+        isExit = YesOrNo(input("<///> Keluar (Y/N): "))
+        if isExit:
             break
 
 def labMenu(userId:int):
@@ -44,7 +44,7 @@ def pilihMonsterLab(userId:int) -> int:
     data = readcsv("monster_inventory")
     hasil = search(0, str(userId), data)
     while True:
-        pilihan = pilihanValid(input("<///> Pilih monster: "), [])
+        pilihan = pilihanValid(input("<///> Pilih monster: "), [str(i+1) for i in range(len(hasil))])
         clear()
         if 0 < pilihan < len(hasil)+1:
             levelMonster = level(userId, hasil[pilihan-1][1])
@@ -82,7 +82,7 @@ f"""{namaMonster} akan di-upgrade ke level {levelMonster + 1}
 Harga untuk melakukan upgrade {namaMonster} adalah {hargaUpgrade} OC""")
     isUpgrade = YesOrNo(input("<///> Lanjutkan upgrade (Y/N): "))
     clear()
-    if isUpgrade == "Y":
+    if isUpgrade:
         #merubah data csv monster_inventory dan oc user
         display(f'Selamat, {namaMonster} berhasil di-upgrade ke level {levelMonster + 1} !')
 

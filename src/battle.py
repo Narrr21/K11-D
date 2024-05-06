@@ -1,4 +1,3 @@
-import os
 import time
 from rng import random
 from share import pilihMonster, level, get_stats,display,potionList, search, readcsv, clear, pilihanValid

@@ -1,12 +1,13 @@
 import os
 
 def YesOrNo(masukan:str) -> str:
+    masukan = str.upper(masukan)
     while True:
         if masukan != "Y" and masukan != "N":
             print("Masukan yang valid hanya Y atau N")
             masukan = input("<///> Y/N: ")
         else:
-            return masukan
+            return masukan == "Y"
 
 def pilihanValid(masukan:str, validRange:list[str]) -> int:
     while True:
@@ -16,12 +17,31 @@ def pilihanValid(masukan:str, validRange:list[str]) -> int:
             print("Masukan tidak valid")
             masukan = input("<///> Pilih perintah: ")
 
+def isDigit(masukan:str) -> int:
+    while True:
+        valid = False
+        for char in masukan:
+            if 48 <= ord(char) <= 57:
+                valid = True
+            else:
+                valid = False
+                print("Masukkan input bertipe Integer, coba lagi!")
+                masukan = input("<///> Masukan : ")
+                break
+        if valid:
+            return int(masukan)
+
+
 def get_stats(id:int, level:int) -> dict:
+    if level == 1:
+        pengaliLevel = 1
+    else:
+        pengaliLevel = ((level - 1) * 10 + 100) / 100
     stat = {
         "Name": statMonster(id, 1),
-        "Atk": int(statMonster(id, 2)),
-        "Def": int(statMonster(id, 3)),
-        "Hp": int(statMonster(id, 4)),
+        "Atk": int(int(statMonster(id, 2)) * pengaliLevel),
+        "Def": int(int(statMonster(id, 3)) * pengaliLevel),
+        "Hp": int(int(statMonster(id, 4)) * pengaliLevel),
         "Level": level
     }
     return stat
