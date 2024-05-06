@@ -1,4 +1,4 @@
-from Battle import showStat
+from battle import showStat
 from share import clear, display, pilihanValid, readcsv, search, level, get_stats, YesOrNo
 
 def inventory(userId:int):

@@ -228,5 +228,3 @@ def potionStatus(userId:int):
     print(hasil)
     status = [[potion[1], 0] for potion in hasil]
     return status
-
-battle()

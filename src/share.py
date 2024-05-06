@@ -1,4 +1,5 @@
 import os
+from monster import monsterList
 
 def YesOrNo(masukan:str) -> str:
     masukan = str.upper(masukan)
@@ -30,22 +31,6 @@ def isDigit(masukan:str) -> int:
                 break
         if valid:
             return int(masukan)
-
-
-def get_stats(id:int, level:int) -> dict:
-    if level == 1:
-        pengaliLevel = 1
-    else:
-        pengaliLevel = ((level - 1) * 10 + 100) / 100
-    stat = {
-        "Name": statMonster(id, 1),
-        "Atk": int(int(statMonster(id, 2)) * pengaliLevel),
-        "Def": int(int(statMonster(id, 3)) * pengaliLevel),
-        "Hp": int(int(statMonster(id, 4)) * pengaliLevel),
-        "Level": level
-    }
-    return stat
-
 
 def display(text:str):
     print(f"""<==================================================================================>
@@ -94,19 +79,6 @@ def readcsv(fileName:str) -> list[list[str]]:
 
 def clear():
     os.system("cls")
-
-def statMonster(monsterId:int, statIndex:int):
-    data = readcsv("monster")
-    hasil = search(0, str(monsterId), data)
-    return hasil[0][statIndex]
-
-def monsterList(userId:int) -> list:
-    data = readcsv("monster_inventory")
-    hasil = search(0, str(userId), data)
-    print("<============> MONSTER LIST <============>")
-    for [i,j] in enumerate(hasil):
-        monsterId = int(j[1])
-        print(f"{i+1}. {statMonster(monsterId, 1)}")
 
 def potionList(userId:int) -> int:
     data = readcsv("item_inventory")
