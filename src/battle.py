@@ -1,7 +1,7 @@
 import os
 import time
 from rng import random
-from share import pilihMonster, level, get_stats,display,potionList, potionStatus, readcsv, clear, pilihanValid
+from share import pilihMonster, level, get_stats,display,potionList, search, readcsv, clear, pilihanValid
 
 def battle() -> bool:
     clear()
@@ -156,7 +156,6 @@ f"""<============> Turn {number} ({allies["Name"]}) <============>
                     return False
                 elif pilihan == 2:
                     nomor = potionList(userId)
-                    print(f"{nomor+1}. Cancel")
                     isCancel = usePotion(status, nomor, allies, maxHpAgent)
                     if isCancel:
                         continue
@@ -190,8 +189,8 @@ def attack(Atk:int, Def:int, attackerName:str, defenderName:str, defender:list):
 
 def usePotion(status:list, number:int, allies:dict, maxHp:int):
     while True:
-        pilihan = pilihanValid(input("<///> Pilih potion: "), [f'{i+1}' for i in range(number+1)])
-        if pilihan in range(1, number+2):
+        pilihan = pilihanValid(input("<///> Pilih potion: "), [str(i) for i in range(1, number+3)])
+        if pilihan in range(1, number+3):
             if pilihan-1 == len(status):
                 clear()
                 return True
@@ -224,5 +223,11 @@ def check(isEscape:bool, agent:dict, musuh:dict) -> int:
     else:
         return 0
     
+def potionStatus(userId:int):
+    data = readcsv("item_inventory")
+    hasil = search(0, str(userId), data)
+    print(hasil)
+    status = [[potion[1], 0] for potion in hasil]
+    return status
 
 battle()

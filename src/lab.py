@@ -1,5 +1,5 @@
 import os
-from share import YesOrNo, display, monsterList, level, get_stats, search, readcsv
+from share import YesOrNo, display, monsterList, level, get_stats, search, readcsv, pilihanValid, clear
 
 def laboratory():
     # SPESIFIKASI
@@ -9,7 +9,7 @@ def laboratory():
     # exit = YesOrNo
     # monsterId = int
     # ALGORITMA
-    os.system("cls")
+    clear()
     while True:
         userId = 3 #Placeholder
         labMenu(userId)
@@ -44,12 +44,12 @@ def pilihMonsterLab(userId:int) -> int:
     data = readcsv("monster_inventory")
     hasil = search(0, str(userId), data)
     while True:
-        pilihan = int(input("<///> Pilih monster: "))
-        os.system('cls')
+        pilihan = pilihanValid(input("<///> Pilih monster: "), [])
+        clear()
         if 0 < pilihan < len(hasil)+1:
             levelMonster = level(userId, hasil[pilihan-1][1])
         else:
-            levelMonster = 10
+            levelMonster = 0
         
         if levelMonster == 5:
             print("max level")
@@ -81,7 +81,7 @@ def upgrade(monsterId:int, levelMonster:int):
 f"""{namaMonster} akan di-upgrade ke level {levelMonster + 1}
 Harga untuk melakukan upgrade {namaMonster} adalah {hargaUpgrade} OC""")
     isUpgrade = YesOrNo(input("<///> Lanjutkan upgrade (Y/N): "))
-    os.system("cls")
+    clear()
     if isUpgrade == "Y":
         #merubah data csv monster_inventory dan oc user
         display(f'Selamat, {namaMonster} berhasil di-upgrade ke level {levelMonster + 1} !')

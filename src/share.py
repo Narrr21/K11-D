@@ -41,10 +41,7 @@ def pilihMonster(userId:int, withList:bool=False) -> int:
     data = readcsv("monster_inventory")
     hasil = search(0, str(userId), data)
     if withList:
-        print("<============> MONSTER LIST <============>")
-        for i in range(len(hasil)):
-            monsterId = int(hasil[i][1])
-            print(f"{i+1}. {statMonster(monsterId, 1)}")
+        monsterList(userId)
     while True:
         pilihan = pilihanValid(input("<///> Pilih monster: "), [f'{i+1}' for i in range(len(data))])
         clear()
@@ -87,18 +84,16 @@ def monsterList(userId:int) -> list:
     data = readcsv("monster_inventory")
     hasil = search(0, str(userId), data)
     print("<============> MONSTER LIST <============>")
-    for i in range(len(hasil)):
-        monsterId = int(hasil[i][1])
+    for [i,j] in enumerate(hasil):
+        monsterId = int(j[1])
         print(f"{i+1}. {statMonster(monsterId, 1)}")
 
 def potionList(userId:int) -> int:
     data = readcsv("item_inventory")
     hasil = search(0, str(userId), data)
     print("<============> POTION LIST <============>")
-    number = 0
-    for potion in hasil:
-        number += 1
-        print(f"{number}. {potion[1]} Potion (Qty: {potion[2]})", end="")
+    for [i, potion] in enumerate(hasil):
+        print(f"{i+1}. {potion[1]} Potion (Qty: {potion[2]})", end="")
         if potion[1] == "strength":
             print(" - Increase ATK Power")
         elif potion[1] == "resilience":
@@ -107,13 +102,8 @@ def potionList(userId:int) -> int:
             print(" - Restore Health")
         else: 
             print()
-    return number
-
-def potionStatus(userId:int):
-    data = readcsv("item_inventory")
-    hasil = search(0, str(userId), data)
-    status = [[potion[1], 0] for potion in hasil]
-    return status
+    print(f"{i+2}. Cancel")
+    return i
 
 def search(searchIndex:int, searchInput:str, file:list) -> list:
     hasil = []

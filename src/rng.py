@@ -39,4 +39,4 @@ def random(a=48271, c=0, m=2**31-1, n=None, seed=None, numRange:list[int]=None) 
     if numRange is None: #saat tidak dimasukkan daerah hasil yang diinginkan
         return x0
     else:
-        return int((x0 / (m - 1)) * (numRange[1] - numRange[0] + 1) + numRange[0])
+        return int((x0 / (m - 1)) * (numRange[1] - numRange[0]) + numRange[0])
