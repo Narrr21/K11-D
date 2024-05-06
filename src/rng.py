@@ -1,25 +1,6 @@
 import os
 import time
 
-
-
-def LCG(a=48271, c=0, m=2**31-1, seed=None) -> int: #C++11's minstd_rand
-    # SPESIFIKASI
-    # Melakukan penghitungan nilai awal menggunakan parameter seed
-    # sebagai iterasi pertama akan mengambil data os dan time sebagai seed
-    # KAMUS
-    # a,c,m,seed = int
-    # x_prev, x0 = float
-    # ALGORITMA
-
-    if seed is None: #iterasi pertama
-        x0 = int(os.getpid() + time.time())
-    else:
-        x0 = seed
-    
-    x_prev = (a * x0 + c) % m
-    return x_prev
-
 def random(a=48271, c=0, m=2**31-1, n=None, seed=None, numRange:list[int]=None) -> int:#C++11's minstd_rand
     # SPESIFIKASI
     # Menghasilkan suatu angka dari daerah hasil yang diinginkan (numRange)

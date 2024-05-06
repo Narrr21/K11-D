@@ -72,13 +72,13 @@ def readcsv(fileName:str) -> list[list[str]]:
             hasil.append(row)
         return hasil
 
+def clear():
+    os.system("cls")
+
 def statMonster(monsterId:int, statIndex:int):
     data = readcsv("monster")
     hasil = search(0, str(monsterId), data)
     return hasil[0][statIndex]
-
-def clear():
-    os.system("cls")
 
 def monsterList(userId:int) -> list:
     data = readcsv("monster_inventory")
