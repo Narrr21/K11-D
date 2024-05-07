@@ -1,7 +1,8 @@
-from share import YesOrNo, display, level, search, readcsv, pilihanValid, clear
-from monster import get_stats, monsterList
+from share import YesOrNo, display, search, pilihanValid, clear, writecsv, index
+from monster import get_stats, monsterList, getMonster, level
+from load import getDataUser, loadInvent
 
-def laboratory():
+def laboratory(userId:int, dataUser:dict=None):
     # SPESIFIKASI
     # Menjalankan laboratory agar pemain dapat mengupgrade monsternya
     # selesai saat monster sudah diupgrade atau user memilih untuk keluar
@@ -10,55 +11,51 @@ def laboratory():
     # monsterId = int
     # ALGORITMA
     clear()
+    dataUser = getDataUser(userId) #Placeholder
+    dataMonster = loadInvent(userId, "monster") #Placeholder
     while True:
-        userId = 3 #Placeholder
-        labMenu(userId)
-        data:list = pilihMonsterLab(userId)
-        monsterId = data[0]
-        levelMonster = data[1]
-        upgrade(monsterId, levelMonster)
+        userName = dataUser["Username"]
+        OC = int(dataUser["OC"])
+        labMenu(userId, userName, OC, dataMonster)
+        [monsterId, levelMonster] = pilihMonsterLab(dataMonster)
+        upgrade(monsterId, levelMonster, OC, dataUser, dataMonster)
         isExit = YesOrNo(input("<///> Keluar (Y/N): "))
         if isExit:
             break
 
-def labMenu(userId:int):
+def labMenu(userId:int, userName:str, OC:int, dataMonster:dict):
     # SPESIFIKASI
     # Menampilkan interface lab dengan list Monster dan list harga
     # KAMUS
     # AlGORITMA
-    print("Selamat datang di Lab Dokter Asep !!!")
-    monsterList(userId)
+    print(f"Selamat datang di Lab Dokter Asep Agent {userName} !!!")
+    monsterList(userId, dataMonster)
     print(
 """<============> UPGRADE PRICE <============>
 1. Level 1 -> Level 2: 300 OC
 2. Level 2 -> Level 3: 500 OC
 3. Level 3 -> Level 4: 800 OC
 4. Level 4 -> Level 5: 1000 OC""")
+    print(f"Anda memiliki {OC} OC ")
 
-def pilihMonsterLab(userId:int) -> int:
+def pilihMonsterLab(dataMonster:dict) -> int:
     # SPESIFIKASI
     # Melakukan loop hingga valid untuk menghasilkan pilihan monster yang ingin diupgrade
     # KAMUS
     # pilihan, level = int
     # ALGORITMA
-    data = readcsv("monster_inventory")
-    hasil = search(0, str(userId), data)
+    jumlahPilihan = len(dataMonster["MonsterID"])
     while True:
-        pilihan = pilihanValid(input("<///> Pilih monster: "), [str(i+1) for i in range(len(hasil))])
+        pilihan = int(pilihanValid(input("<///> Pilih monster: "), [str(i+1) for i in range(jumlahPilihan)]))
         clear()
-        if 0 < pilihan < len(hasil)+1:
-            levelMonster = level(userId, hasil[pilihan-1][1])
-        else:
-            levelMonster = 0
-        
+        monsterId = dataMonster["MonsterID"][pilihan-1]
+        levelMonster = level(monsterId, dataMonster)
         if levelMonster == 5:
             print("max level")
-        elif 0 < pilihan < len(hasil)+1:
-            return [hasil[pilihan-1][1], levelMonster]
         else:
-            print("pilihan tidak tersedia!")
+            return [monsterId, levelMonster]
 
-def upgrade(monsterId:int, levelMonster:int):
+def upgrade(monsterId:int, levelMonster:int, OC:int, data:dict, dataMonster:list):
     # SPESIFIKASI
     # Melakukan upgrade monster yang dipilih dengan id adalah monsterId
     # upgrade akan menambahkan 1 level pada monster dan mengurangi oc user sesuai biayanya
@@ -66,7 +63,6 @@ def upgrade(monsterId:int, levelMonster:int):
     # namaMonster = string
     # level, namaMonster, hargaUpgrade = int
     # isUpgrade = YesOrNo
-    
     statMonster = get_stats(monsterId, levelMonster)
     namaMonster:str = statMonster["Name"] 
     if levelMonster == 1:
@@ -77,15 +73,26 @@ def upgrade(monsterId:int, levelMonster:int):
         hargaUpgrade = 800
     elif levelMonster == 4:
         hargaUpgrade = 1000
-    display(
+    if hargaUpgrade <= OC:
+        display(
 f"""{namaMonster} akan di-upgrade ke level {levelMonster + 1}
-Harga untuk melakukan upgrade {namaMonster} adalah {hargaUpgrade} OC""")
-    isUpgrade = YesOrNo(input("<///> Lanjutkan upgrade (Y/N): "))
-    clear()
-    if isUpgrade:
-        #merubah data csv monster_inventory dan oc user
-        display(f'Selamat, {namaMonster} berhasil di-upgrade ke level {levelMonster + 1} !')
+Harga untuk melakukan upgrade {namaMonster} adalah {hargaUpgrade} OC
+Saat ini anda memiliki {OC} OC""")
+        isUpgrade = YesOrNo(input("<///> Lanjutkan upgrade (Y/N): "))
+        clear()
+        if isUpgrade:
+            data["OC"] = OC - hargaUpgrade
+            dataMonster["Level"] = str(levelMonster + 1)
+            display(f'Selamat, {namaMonster} berhasil di-upgrade ke level {levelMonster + 1} !')
+    else:
+        print(
+f"""Anda hanya memiliki {OC} OC
+butuh {hargaUpgrade} OC untuk mengupgrade {namaMonster}""")
 
-laboratory()
+def changeUpgrade(user:int, OC:int):
+    writecsv("")
+
+if __name__ == "__main__":
+    laboratory(2)
 
 
