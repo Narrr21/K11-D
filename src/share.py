@@ -59,6 +59,10 @@ def readcsv(fileName:str) -> list[list[str]]:
             hasil.append(row)
         return hasil
 
+def writecsv(context:str, fileName:str):
+    with open(f'data\{fileName}.csv', 'w') as file:
+        file.write(context + '\n')
+
 def clear():
     os.system("cls")
 
