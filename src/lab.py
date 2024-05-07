@@ -16,20 +16,24 @@ def laboratory(userId:int, dataUser:dict=None):
     while True:
         userName = dataUser["Username"]
         OC = int(dataUser["OC"])
-        labMenu(userId, userName, OC, dataMonster)
-        [monsterId, levelMonster] = pilihMonsterLab(dataMonster)
+        jumlahPilihan = len(dataMonster["MonsterID"]) + 1
+        labMenu(userId, userName, OC, dataMonster, jumlahPilihan)
+        [monsterId, levelMonster] = pilihMonsterLab(dataMonster, jumlahPilihan)
+        if monsterId == 0:
+            break
         upgrade(monsterId, levelMonster, OC, dataUser, dataMonster)
         isExit = YesOrNo(input("<///> Keluar (Y/N): "))
         if isExit:
             break
 
-def labMenu(userId:int, userName:str, OC:int, dataMonster:dict):
+def labMenu(userId:int, userName:str, OC:int, dataMonster:dict, jumlahPilihan:int):
     # SPESIFIKASI
     # Menampilkan interface lab dengan list Monster dan list harga
     # KAMUS
     # AlGORITMA
     print(f"Selamat datang di Lab Dokter Asep Agent {userName} !!!")
     monsterList(userId, dataMonster)
+    print(f"{jumlahPilihan}. Cancel")
     print(
 """<============> UPGRADE PRICE <============>
 1. Level 1 -> Level 2: 300 OC
@@ -38,21 +42,22 @@ def labMenu(userId:int, userName:str, OC:int, dataMonster:dict):
 4. Level 4 -> Level 5: 1000 OC""")
     print(f"Anda memiliki {OC} OC ")
 
-def pilihMonsterLab(dataMonster:dict) -> int:
+def pilihMonsterLab(dataMonster:dict, jumlahPilihan:int) -> int:
     # SPESIFIKASI
     # Melakukan loop hingga valid untuk menghasilkan pilihan monster yang ingin diupgrade
     # KAMUS
     # pilihan, level = int
     # ALGORITMA
-    jumlahPilihan = len(dataMonster["MonsterID"])
     while True:
         pilihan = int(pilihanValid(input("<///> Pilih monster: "), [str(i+1) for i in range(jumlahPilihan)]))
-        clear()
+        if pilihan == jumlahPilihan:
+            return[0, 0]
         monsterId = dataMonster["MonsterID"][pilihan-1]
         levelMonster = level(monsterId, dataMonster)
         if levelMonster == 5:
             print("max level")
         else:
+            clear()
             return [monsterId, levelMonster]
 
 def upgrade(monsterId:int, levelMonster:int, OC:int, data:dict, dataMonster:list):
