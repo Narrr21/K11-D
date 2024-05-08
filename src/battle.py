@@ -1,19 +1,21 @@
 from rng import random
-from share import level, display,potionList, search, readcsv, clear, pilihanValid, sleep
-from monster import get_stats, pilihMonster
-
-def battle() -> bool:
+from share import display, clear, pilihanValid, sleep
+from monster import get_stats, pilihMonster, level, banyakMonster
+from potion import potionStatus, potionList
+from load import loadInvent
+def battle(arena:int=None) -> bool:
     clear()
     hasil = 0
     userId = 3 #Placeholder
     namaUser = "x" #placeholder
-    dataBattle = encounter(userId, namaUser)
-    statAgent:dict = dataBattle[0]
-    statMusuh:dict = dataBattle[1]
+    if arena is None:
+        [statAgent, statMusuh] = encounter(userId, namaUser)
+    else:
+        [statAgent, statMusuh] = encounter(userId, namaUser, arena)
     ronde:int = 0
     status = potionStatus(userId)
-    maxHpMusuh = statMusuh["Hp"]
-    maxHpAgent = statAgent["Hp"]
+    maxHpMusuh = statMusuh["HP"]
+    maxHpAgent = statAgent["HP"]
     clear()
     while hasil == 0:
         ronde += 1
@@ -77,10 +79,12 @@ r"""                                ___.
                  / ,\"'\"\\,'               `/  `-.|\"""")
     
 
-def encounter(userId:int, namaUser:str) -> list:
-    banyakMonster = len(readcsv("monster"))
-    idMusuh = random(numRange=[1,banyakMonster])
-    levelMusuh = random(numRange=[1,5])
+def encounter(userId:int, namaUser:str, arena:int=None) -> list:
+    idMusuh = random(numRange=[1, banyakMonster()])
+    if arena is None:
+        levelMusuh = random(numRange=[1,5])
+    else:
+        levelMusuh = arena
     statMusuh = get_stats(idMusuh, levelMusuh)
     print(
 r"""           _.------.                        .----.__
@@ -100,7 +104,8 @@ r"""           _.------.                        .----.__
     print(f"RAWRR, Monster {statMusuh["Name"]} telah muncul !!!")
     showStat(statMusuh)
     monsterId = pilihMonster(userId, withList=True)
-    levelMonster = level(userId, monsterId)
+    statUser = loadInvent(userId, "monster")
+    levelMonster = level(monsterId, statUser)
     statAgent = get_stats(monsterId, levelMonster)
     print(
 r"""
@@ -128,26 +133,26 @@ r"""
 
 def showStat(stat:dict, maxHp:int=None) -> str:
     if maxHp is None:
-        maxHp = stat["Hp"]
+        maxHp = stat["HP"]
     display (
 f"""Name      : {stat["Name"]}
 ATK Power : {stat["Atk"]}
 DEF Power : {stat["Def"]}
-HP        : {stat["Hp"]}/{maxHp}
+HP        : {stat["HP"]}/{maxHp}
 Level     : {stat["Level"]}""")
 
 def turn(number:int, userId:int, allies:dict, enemies:dict, status:list, maxHpMusuh:int, maxHpAgent:int, valid=True, agent:bool=True) -> bool:
+    showStat(enemies, maxHpMusuh)
+    print("                                         VS                                         ")
+    showStat(allies, maxHpAgent)
     if agent:
         while True:
-            showStat(enemies, maxHpMusuh)
-            print("                                         VS                                         ")
-            showStat(allies, maxHpAgent)
             print(
 f"""<============> Turn {number} ({allies["Name"]}) <============>
 1. Attack
 2. Use Potion
 3. Escape""")
-            pilihan = pilihanValid(input("<///> Pilih perintah: "), ["1", "2", "3"])
+            pilihan =int(pilihanValid(input("<///> Pilih perintah: "), ["1", "2", "3"]))
             if pilihan in [1, 2, 3]:
                 if pilihan == 1:
                     attack(allies["Atk"], enemies["Def"], allies["Name"], enemies["Name"], enemies)
@@ -165,11 +170,7 @@ f"""<============> Turn {number} ({allies["Name"]}) <============>
                     return True
             else:
                 clear()
-
     else:
-        showStat(enemies, maxHpMusuh)
-        print("                                         VS                                         ")
-        showStat(allies, maxHpAgent)
         print(f"<============> Turn {number} ({enemies["Name"]}) <============>")
         attack(enemies["Atk"], allies["Def"], enemies["Name"], allies["Name"], allies)
         clear()
@@ -188,7 +189,7 @@ def attack(Atk:int, Def:int, attackerName:str, defenderName:str, defender:list):
 
 def usePotion(status:list, number:int, allies:dict, maxHp:int):
     while True:
-        pilihan = pilihanValid(input("<///> Pilih potion: "), [str(i) for i in range(1, number+3)])
+        pilihan = int(pilihanValid(input("<///> Pilih potion: "), [str(i) for i in range(1, number+3)]))
         if pilihan in range(1, number+3):
             if pilihan-1 == len(status):
                 clear()
@@ -198,11 +199,11 @@ def usePotion(status:list, number:int, allies:dict, maxHp:int):
             else:
                 print(f"{status[pilihan-1][0]} potion digunakan")
                 #potion berkurang
-                if status[pilihan-1][0] == "strength":
+                if status[pilihan-1][0] == "Strength":
                     allies["Atk"] += int(5 / 100 * allies["Atk"])
-                elif status[pilihan-1][0] == "resilience":
+                elif status[pilihan-1][0] == "Resilience":
                     allies["Def"] += int(5 / 100 * allies["Def"])
-                elif status[pilihan-1][0] == "healing":
+                elif status[pilihan-1][0] == "Healing":
                     allies["Hp"] += int(25 / 100 * maxHp)
                     if allies["Hp"] > maxHp:
                         allies["Hp"] = maxHp
@@ -221,10 +222,6 @@ def check(isEscape:bool, agent:dict, musuh:dict) -> int:
         return 3
     else:
         return 0
-    
-def potionStatus(userId:int):
-    data = readcsv("item_inventory")
-    hasil = search(0, str(userId), data)
-    print(hasil)
-    status = [[potion[1], 0] for potion in hasil]
-    return status
+
+if __name__ == "__main__":
+    battle()
