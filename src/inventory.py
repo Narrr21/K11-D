@@ -1,68 +1,68 @@
 from battle import showStat
-from share import clear, display, pilihanValid, readcsv, search, level, YesOrNo
-from monster import get_stats, getMonsterUser
-from potion import getPotionUser
+from share import clear, display, pilihanValid, YesOrNo, displayBar
+from monster import get_stats, getMonster, level
+from potion import getPotion
+from load import load, getDataUser, loadInvent
 
 def inventory(userId:int):
-    while True:
+    dataUser = getDataUser(userId) #Placeholder
+    monsterUser = loadInvent(userId, "monster") #Placeholder
+    potionUser = getPotion(userId)
+    while True: 
         clear()
-        dataMonster = monsterInventory(userId)
-        inventMonsterUser = dataMonster[0]
-        dataStatMonster = dataMonster[1]
-
-        dataPotion = potionInventory(userId)
-        inventPotionUser = dataPotion[0]
-        dataStatPotion = dataPotion[1]
+        [inventMonsterUser, dataStatMonster] = monsterInventory(monsterUser)
+        [inventPotionUser, dataStatPotion] = potionInventory(potionUser)
         
         # penggabungan list monster dan potion
         for i in inventPotionUser:
             inventMonsterUser.append(i)
         invent = inventMonsterUser
-
         # Menampilkan hasil ke terminal
-        print(f"<=========> Inventory List (User ID : {userId})<==========>")
+        displayBar("User Info")
+        print(
+f"""User ID : {userId}
+Nama    : {dataUser["Username"]}
+OC      : {dataUser["OC"]}""")
+        displayBar("Inventory List")
         for barang in enumerate(invent):
             print(f"{barang[0]+1}. {barang[1]}")
-        nomor = len(invent)
+        nomor = len(invent) + 1
+        print(f"{nomor}. Keluar")
         print("Ketikkan id untuk menampilkan item")
-        pilihan = pilihanValid(input("<///> : "), [str(i) for i in range(1, nomor+1)])
-        if pilihan in range(1, nomor+1):
-            clear()
-            if invent[pilihan-1][:7] == "Monster":
-                print("Monster")
-                showStat(dataStatMonster[pilihan-1])
-            elif invent[pilihan-1][:6] == "Potion":
-                data = dataStatPotion[pilihan - len(dataStatMonster) - 1]
-                print("Potion")
-                display(
+        pilihan = int(pilihanValid(input("<///> : "), [str(i) for i in range(1, nomor+1)]))
+        clear()
+        if pilihan == nomor:
+            break
+        elif invent[pilihan-1][:7] == "Monster":
+            print("Monster")
+            showStat(dataStatMonster[pilihan-1])
+        elif invent[pilihan-1][:6] == "Potion":
+            data = dataStatPotion[pilihan - len(dataStatMonster) - 1]
+            print("Potion")
+            display(
 f"""Type     : {data[0]}
 Quantity : {data[1]}""")
-        isExit = YesOrNo(input("<///> Keluar (Y/N): "))
+        isExit = YesOrNo(input("<///> Keluar Inventory (Y/N): "))
         if isExit:
             break
 
-def monsterInventory(userId:int):
+def monsterInventory(monsterUser:dict):
     # memanggil data monster, monster_inventory dan mencari user yang sesuai
-    dataMonster = readcsv("monster")
-    monsterUser = getMonsterUser(userId)
-    inventMonsterUser = []
+    desc = []
     dataStatMonster = []
-
     # mwmbuat data string monster dan data stat
-    for monster in monsterUser:
-        monsterId:int = int(monster[1])
-        dataMonsterUser = search(0, str(monsterId), dataMonster)
-        namaMonster = dataMonsterUser[0][1]
-        levelMonster = level(userId, monsterId)
-        maxHp = dataMonsterUser[0][4]
-        hasil = "Monster" + " " * (15- len("Monster")) + f"(Name: {namaMonster}, Lvl: {levelMonster}, HP: {maxHp})"
-        inventMonsterUser.append(hasil)
+    for monster in monsterUser["MonsterID"]:
+        monsterId:int = int(monster)
+        levelMonster = level(monsterId, monsterUser)
         stat = get_stats(monsterId, levelMonster)
+        maxHp = stat["HP"]
+        namaMonster = stat["Name"]
+        hasil = "Monster" + " " * (15- len("Monster")) + f"(Name: {namaMonster}, Lvl: {levelMonster}, HP: {maxHp})"
+        desc.append(hasil)
         dataStatMonster.append(stat)    
-    return [inventMonsterUser, dataStatMonster]
+    return [desc, dataStatMonster]
 
-def potionInventory(userId:int):
-    potionUser = getPotionUser(userId)
+def potionInventory(potionUser:dict):
     inventPotionUser = []
     dataPotion = []
     # membuat data string potion dan data potion
