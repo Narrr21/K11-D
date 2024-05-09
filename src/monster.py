@@ -44,7 +44,7 @@ def pilihMonster(userId:int, withList:bool=False) -> int:
     if withList:
         monsterList(userId)
     while True:
-        pilihan = int(pilihanValid(input("<///> Pilih monster: "), [f'{i+1}' for i in range(len(data))]))
+        pilihan = int(pilihanValid(input("<///> Pilih monster untuk bertarung : "), [f'{i+1}' for i in range(len(data))]))
         clear()
         if 0 < pilihan < len(hasil)+1:
             return hasil[pilihan-1][1]

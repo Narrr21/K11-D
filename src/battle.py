@@ -4,36 +4,39 @@ from monster import get_stats, pilihMonster, level, banyakMonster
 from potion import potionStatus, potionList, getPotion
 from load import loadInvent, load
 
-def battle(dataUser:dict, potionUser:dict, arena:int=None) -> bool:
+def battle(dataUser:dict, potionUser:dict, arena:int=None, statAgent:dict=None) -> bool:
     clear()
-    hasil = 0
+    kondisi = 0
     userId = dataUser["ID"]
     namaUser = dataUser["Username"]
     if arena is None:
         [statAgent, statMusuh] = encounter(userId, namaUser)
     else:
-        [statAgent, statMusuh] = encounter(userId, namaUser, arena)
+        idMusuh = random(numRange=[1, banyakMonster()])
+        levelMusuh = random(numRange=[1,5])
+        statMusuh = get_stats(idMusuh, levelMusuh) 
     ronde:int = 0
     status = potionStatus(potionUser)
     maxHpMusuh = statMusuh["HP"]
     maxHpAgent = statAgent["HP"]
+    levelMusuh = statMusuh["Level"]
     clear()
-    while hasil == 0:
+    while kondisi == 0:
         ronde += 1
         isEscape = turn(ronde, statAgent, statMusuh, status, potionUser, maxHpMusuh, maxHpAgent)
-        hasil = check(isEscape, statAgent, statMusuh)
-        if hasil != 0:
+        [hasil, kondisi] = check(isEscape, statAgent, statMusuh)
+        if kondisi != 0:
             break
         turn(ronde, statAgent, statMusuh, status, potionUser, maxHpMusuh, maxHpAgent, agent=False)
-        hasil = check(isEscape, statAgent, statMusuh)
+        [hasil, kondisi] = check(isEscape, statAgent, statMusuh)
     clear()
     showStat(statMusuh, maxHpMusuh)
     print("                                         VS                                         ")
     showStat(statAgent, maxHpAgent)
-    if hasil == 1:
+    if kondisi == 1:
         display("Anda berhasil kabur dari Battle!")
-        return False
-    elif hasil == 2:
+        return hasil
+    elif kondisi == 2:
         display("Sayang sekali anda kalah")
         print(
 r"""        `;-.          ___,
@@ -49,10 +52,11 @@ r"""        `;-.          ___,
              >   \    /
             (_,-'`> .'
                  (_,'""")
-        return False
-    elif hasil == 3:
-        dataUser["OC"] += random(numRange=[20, 50])
-        display("Selamat anda menang")
+        return hasil
+    elif kondisi == 3:
+        hadiah = random(numRange=[30, 40]) * levelMusuh
+        dataUser["OC"] = str(int(dataUser["OC"]) + hadiah)
+        display(f"Selamat anda menang, mendapatkan {hadiah} OC !!!")
         print(
 r"""                                ___.
                                 L._, \\
@@ -85,15 +89,12 @@ r"""                                ___.
                 .'        /\"'          |  \"'   '_
                /_|.-'\\ ,\".             '.'`__'-( \\
                  / ,\"'\"\\,'               `/  `-.|\"""")
-        return True
+        return hasil
     
 
-def encounter(userId:int, namaUser:str, arena:int=None) -> list:
+def encounter(userId:int, namaUser:str) -> list:
     idMusuh = random(numRange=[1, banyakMonster()])
-    if arena is None:
-        levelMusuh = random(numRange=[1,5])
-    else:
-        levelMusuh = arena
+    levelMusuh = random(numRange=[1,5])
     statMusuh = get_stats(idMusuh, levelMusuh)
     print(
 r"""           _.------.                        .----.__
@@ -219,15 +220,15 @@ def usePotion(status:list, potionUser:dict, maxPilihan:int, allies:dict, maxHp:i
             sleep(2)
             return False
 
-def check(isEscape:bool, agent:dict, musuh:dict) -> int:
+def check(isEscape:bool, agent:dict, musuh:dict) -> list[bool, int]:
     if isEscape:
-        return 1
+        return [False, 1]
     elif agent["HP"] == 0:
-        return 2
+        return [False, 2]
     elif musuh["HP"] == 0:
-        return 3
+        return [True, 3]
     else:
-        return 0
+        return [False, 0]
 
 if __name__ == "__main__":
     userId = 3

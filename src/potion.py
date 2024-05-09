@@ -13,7 +13,7 @@ def getPotion(userId:int):
 def potionStatus(potionUser):
     status = {}
     for potion in potionUser:
-        status[potion] = str(0)
+        status[potion] = 0
     return status
 
 def tambahPotion(type:str, quanntity:int, dataPotion:dict):

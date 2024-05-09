@@ -97,5 +97,19 @@ def search(searchIndex:int, searchInput:str, file:list) -> list:
             hasil.append(row)
     return hasil
 
+def maxEle(data:list):
+    hasil = data[0]
+    for i in data:
+        if i > hasil:
+            hasil = i
+    return hasil
+
+def minEle(data:list):
+    hasil = data[0]
+    for i in data:
+        if i < hasil:
+            hasil = i
+    return hasil
+
 if __name__ == "__main__":
     ...
