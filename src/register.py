@@ -1,42 +1,30 @@
-from share import split, display, sleep, clear
+from share import display, sleep, clear, writecsv, YesOrNo
+from load import load, showDict
 
-def register():
-    with open(r"data\user.csv", "r+") as file:
-        dataTemp:list = []
-        for line in file:
-            row = list(split(line, ";"))
-            dataTemp.append(row)
-        user = dataUser(dataTemp)
-        id = len(user["ID"]) + 1
-        namaUser = inputName(user)
+def register(dataUser:dict):
+    while True:
+        id = len(dataUser["ID"]) + 1
+        namaUser = inputName(dataUser)
         password = inputPass()
-        context = f"{id};{namaUser};{password};agent;0"
-        file.write(context + '\n')
+        newUser = {
+            "ID" : id,
+            "Username" : namaUser,
+            "Password" : password,
+            "Role" : "agent",
+            "OC" : 0
+        }
+        showDict(newUser)
+        isRegister = YesOrNo(input("Registrasi Akun ? (Y/N): "))
+        if not isRegister:
+            clear()
+            continue
+        content = f"{id};{namaUser};{password};agent;0"
+        writecsv(content, "user")
         print("registering your account...")
         sleep(3)
         clear()
         display("account registered")
-
-def dataUser(data:list) -> dict:
-    userId:list = []
-    username:list = []
-    password:list = []
-    role:list = []
-    oc:list = []
-    dataUser:dict = {
-        "ID" : userId,
-        "Username" : username,
-        "Pass" : password,
-        "Role" : role,
-        "OC" : oc
-    }
-    for user in data[1:]:
-        userId.append(int(user[0]))
-        username.append(user[1])
-        password.append(user[2])
-        role.append(user[3])
-        oc.append(int(user[4]))
-    return dataUser
+        break
 
 def inputName(data:dict) -> str:
     while True:
@@ -55,7 +43,7 @@ def inputPass() -> str:
         else:
             print("password berbeda, masukkan password lagi!")
 
-
+dataUser = load("user")
 login = False
 if not login:
-    register()
+    register(dataUser)
