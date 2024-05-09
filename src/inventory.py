@@ -1,18 +1,15 @@
 from battle import showStat
 from share import clear, display, pilihanValid, YesOrNo, displayBar
-from monster import get_stats, getMonster, level
+from monster import get_stats, level
 from potion import getPotion
-from load import load, getDataUser, loadInvent
+from load import getDataUser, loadInvent
 
-def inventory(userId:int):
-    dataUser = getDataUser(userId) #Placeholder
-    monsterUser = loadInvent(userId, "monster") #Placeholder
-    potionUser = getPotion(userId)
+
+def inventory(dataUser, monsterUser, potionUser):
     while True: 
         clear()
         [inventMonsterUser, dataStatMonster] = monsterInventory(monsterUser)
         [inventPotionUser, dataStatPotion] = potionInventory(potionUser)
-        
         # penggabungan list monster dan potion
         for i in inventPotionUser:
             inventMonsterUser.append(i)
@@ -20,7 +17,7 @@ def inventory(userId:int):
         # Menampilkan hasil ke terminal
         displayBar("User Info")
         print(
-f"""User ID : {userId}
+f"""User ID : {dataUser["ID"]}
 Nama    : {dataUser["Username"]}
 OC      : {dataUser["OC"]}""")
         displayBar("Inventory List")
@@ -79,4 +76,9 @@ def potionInventory(potionUser:dict):
         inventPotionUser.append(hasil)
     return [inventPotionUser, dataPotion]
 
-inventory(3)
+if __name__ == "__main__":
+    userId = 3
+    dataPotion = getPotion(userId)
+    dataUser = getDataUser(userId) #Placeholder
+    monsterUser = loadInvent(userId, "monster") #Placeholder
+    inventory(dataUser, monsterUser, dataPotion)

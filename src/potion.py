@@ -1,23 +1,44 @@
-from share import readcsv, search
+from load import loadInvent
+from share import displayBar
 
-def getPotionUser(userId:int):
-    inventPotion = readcsv("item_inventory")
-    potionUser = search(0, str(userId), inventPotion)
-    quantity = [0 for _ in range(3)]
-    for potion in potionUser:
-        if potion[1] == "Healing":
-            quantity[0] = int(potion[2])
-        elif potion[1] == "Strength":
-            quantity[1] = int(potion[2])
-        else: # potion[1] == "Resilience"
-            quantity[2] = int(potion[2])
-    data:dict = {
-        "Healing" : quantity[0],
-        "Strength" : quantity[1],
-        "Resilience" : quantity[2],
-    }
+def getPotion(userId:int):
+    potionUser = loadInvent(userId, "potion")
+    data = {}
+    for [i ,potion] in enumerate(potionUser["Type"]):
+        quantityPotion = int(potionUser["Quantity"][i])
+        if quantityPotion > 0:
+            data[potion] = str(quantityPotion)
     return data
+
+def potionStatus(potionUser):
+    status = {}
+    for potion in potionUser:
+        status[potion] = str(0)
+    return status
 
 def tambahPotion(type:str, quanntity:int, dataPotion:dict):
     dataPotion[type] += quanntity
     return dataPotion
+
+def potionList(potionUser:dict) -> int:
+    displayBar("POTION LIST")
+    for [i, potion] in enumerate(potionUser):
+        space = 12 - len(potion)
+        print(f"{i+1}. {potion} Potion" + space * " " + f"(Qty: {potionUser[potion]})", end="")
+        if potion == "Strength":
+            print(" - Increase ATK Power")
+        elif potion == "Resilience":
+            print(" - Increase DEF Power")
+        elif potion == "Healing":
+            print(" - Restore Health")
+        else: 
+            print()
+    max = len(potionUser) + 1
+    print(f"{max}. Cancel")
+    return max
+
+if __name__ == "__main__":
+    potionUser = getPotion(3)
+    # print(potionUser)
+    # potionList(potionUser)
+    # print(potionStatus(potionUser))

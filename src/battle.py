@@ -1,32 +1,38 @@
 from rng import random
-from share import display, clear, pilihanValid, sleep
+from share import display, clear, pilihanValid, sleep, displayBar
 from monster import get_stats, pilihMonster, level, banyakMonster
-from potion import potionStatus, potionList
-from load import loadInvent
-def battle(arena:int=None) -> bool:
+from potion import potionStatus, potionList, getPotion
+from load import loadInvent, load
+
+def battle(dataUser:dict, potionUser:dict, arena:int=None) -> bool:
     clear()
     hasil = 0
-    userId = 3 #Placeholder
-    namaUser = "x" #placeholder
+    userId = dataUser["ID"]
+    namaUser = dataUser["Username"]
     if arena is None:
         [statAgent, statMusuh] = encounter(userId, namaUser)
     else:
         [statAgent, statMusuh] = encounter(userId, namaUser, arena)
     ronde:int = 0
-    status = potionStatus(userId)
+    status = potionStatus(potionUser)
     maxHpMusuh = statMusuh["HP"]
     maxHpAgent = statAgent["HP"]
     clear()
     while hasil == 0:
         ronde += 1
-        isEscape = turn(ronde, userId, statAgent, statMusuh, status, maxHpMusuh, maxHpAgent)
+        isEscape = turn(ronde, statAgent, statMusuh, status, potionUser, maxHpMusuh, maxHpAgent)
         hasil = check(isEscape, statAgent, statMusuh)
         if hasil != 0:
             break
-        turn(ronde, userId, statAgent, statMusuh, status, maxHpMusuh, maxHpAgent, agent=False)
+        turn(ronde, statAgent, statMusuh, status, potionUser, maxHpMusuh, maxHpAgent, agent=False)
         hasil = check(isEscape, statAgent, statMusuh)
+    clear()
+    showStat(statMusuh, maxHpMusuh)
+    print("                                         VS                                         ")
+    showStat(statAgent, maxHpAgent)
     if hasil == 1:
         display("Anda berhasil kabur dari Battle!")
+        return False
     elif hasil == 2:
         display("Sayang sekali anda kalah")
         print(
@@ -43,7 +49,9 @@ r"""        `;-.          ___,
              >   \    /
             (_,-'`> .'
                  (_,'""")
+        return False
     elif hasil == 3:
+        dataUser["OC"] += random(numRange=[20, 50])
         display("Selamat anda menang")
         print(
 r"""                                ___.
@@ -77,6 +85,7 @@ r"""                                ___.
                 .'        /\"'          |  \"'   '_
                /_|.-'\\ ,\".             '.'`__'-( \\
                  / ,\"'\"\\,'               `/  `-.|\"""")
+        return True
     
 
 def encounter(userId:int, namaUser:str, arena:int=None) -> list:
@@ -141,37 +150,32 @@ DEF Power : {stat["Def"]}
 HP        : {stat["HP"]}/{maxHp}
 Level     : {stat["Level"]}""")
 
-def turn(number:int, userId:int, allies:dict, enemies:dict, status:list, maxHpMusuh:int, maxHpAgent:int, valid=True, agent:bool=True) -> bool:
-    showStat(enemies, maxHpMusuh)
-    print("                                         VS                                         ")
-    showStat(allies, maxHpAgent)
+def turn(number:int, allies:dict, enemies:dict, status:list, potionUser:dict, maxHpMusuh:int, maxHpAgent:int, agent:bool=True) -> bool:
     if agent:
         while True:
+            clear()
+            showStat(enemies, maxHpMusuh)
+            print("                                         VS                                         ")
+            showStat(allies, maxHpAgent)
+            displayBar(f"Turn {number} ({allies["Name"]})")
             print(
-f"""<============> Turn {number} ({allies["Name"]}) <============>
-1. Attack
+f"""1. Attack
 2. Use Potion
 3. Escape""")
             pilihan =int(pilihanValid(input("<///> Pilih perintah: "), ["1", "2", "3"]))
-            if pilihan in [1, 2, 3]:
-                if pilihan == 1:
-                    attack(allies["Atk"], enemies["Def"], allies["Name"], enemies["Name"], enemies)
-                    clear()
-                    return False
-                elif pilihan == 2:
-                    nomor = potionList(userId)
-                    isCancel = usePotion(status, nomor, allies, maxHpAgent)
-                    if isCancel:
-                        continue
-                    clear()
-                    return False
-                else:
-                    clear()
-                    return True
+            if pilihan == 1:
+                attack(allies["Atk"], enemies["Def"], allies["Name"], enemies["Name"], enemies)
+                return False
+            elif pilihan == 2:
+                maxPilihan = potionList(potionUser)
+                isCancel = usePotion(status, potionUser, maxPilihan, allies, maxHpAgent)
+                if isCancel:
+                    continue
+                return False
             else:
-                clear()
+                return True
     else:
-        print(f"<============> Turn {number} ({enemies["Name"]}) <============>")
+        displayBar(f"Turn {number} ({enemies["Name"]})")
         attack(enemies["Atk"], allies["Def"], enemies["Name"], allies["Name"], allies)
         clear()
 
@@ -182,46 +186,51 @@ def attack(Atk:int, Def:int, attackerName:str, defenderName:str, defender:list):
     DEF = rngATK * (Def/100)
     damage = int(rngATK - DEF)
     print(f"{attackerName} attack {defenderName} dealing {damage} damage !!!")
-    defender["Hp"] -= damage
-    if defender["Hp"] < 0:
-        defender["Hp"] = 0
+    defender["HP"] -= damage
+    if defender["HP"] < 0:
+        defender["HP"] = 0
     sleep(3)
 
-def usePotion(status:list, number:int, allies:dict, maxHp:int):
+def usePotion(status:list, potionUser:dict, maxPilihan:int, allies:dict, maxHp:int):
     while True:
-        pilihan = int(pilihanValid(input("<///> Pilih potion: "), [str(i) for i in range(1, number+3)]))
-        if pilihan in range(1, number+3):
-            if pilihan-1 == len(status):
-                clear()
-                return True
-            elif status[pilihan-1][1] == 1:
-                print("sudah digunakan")
-            else:
-                print(f"{status[pilihan-1][0]} potion digunakan")
-                #potion berkurang
-                if status[pilihan-1][0] == "Strength":
-                    allies["Atk"] += int(5 / 100 * allies["Atk"])
-                elif status[pilihan-1][0] == "Resilience":
-                    allies["Def"] += int(5 / 100 * allies["Def"])
-                elif status[pilihan-1][0] == "Healing":
-                    allies["Hp"] += int(25 / 100 * maxHp)
-                    if allies["Hp"] > maxHp:
-                        allies["Hp"] = maxHp
-                status[pilihan-1][1] = 1
-                sleep(3)
-                return False
+        pilihan = int(pilihanValid(input("<///> Pilih potion: "), [str(i+1) for i in range(maxPilihan)]))
+        if pilihan-1 == len(status):
+            clear()
+            return True
+        typePotion = [potion for potion in potionUser][pilihan-1]
+        quantity = int(potionUser[typePotion])
+        if quantity == 0:
+            print(f"{typePotion} potion sudah habis")
+        elif status[typePotion] == "1":
+            print("sudah digunakan")
         else:
-            print("pilihan tidak tersedia!")
+            print(f"{typePotion} potion digunakan")
+            quantity -= 1
+            potionUser[typePotion] = str(quantity)
+            if typePotion == "Strength":
+                allies["Atk"] += int(5 / 100 * allies["Atk"])
+            elif typePotion == "Resilience":
+                allies["Def"] += int(5 / 100 * allies["Def"])
+            elif typePotion == "Healing":
+                allies["HP"] += int(25 / 100 * maxHp)
+                if allies["HP"] > maxHp:
+                    allies["HP"] = maxHp
+            status[typePotion] = str(1)
+            sleep(2)
+            return False
 
 def check(isEscape:bool, agent:dict, musuh:dict) -> int:
     if isEscape:
         return 1
-    elif agent["Hp"] == 0:
+    elif agent["HP"] == 0:
         return 2
-    elif musuh["Hp"] == 0:
+    elif musuh["HP"] == 0:
         return 3
     else:
         return 0
 
 if __name__ == "__main__":
-    battle()
+    userId = 3
+    potionUser = getPotion(userId)
+    dataUser = load("user", userId)
+    isMenang = battle(dataUser, potionUser)

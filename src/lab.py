@@ -1,5 +1,5 @@
-from share import YesOrNo, display, search, pilihanValid, clear, writecsv, index
-from monster import get_stats, monsterList, getMonster, level
+from share import YesOrNo, display, pilihanValid, clear, writecsv, displayBar
+from monster import get_stats, monsterList, level
 from load import getDataUser, loadInvent
 
 def laboratory(userId:int, dataUser:dict=None):
@@ -31,12 +31,12 @@ def labMenu(userId:int, userName:str, OC:int, dataMonster:dict, jumlahPilihan:in
     # Menampilkan interface lab dengan list Monster dan list harga
     # KAMUS
     # AlGORITMA
-    print(f"Selamat datang di Lab Dokter Asep Agent {userName} !!!")
+    print(f"Selamat datang di Lab Dokter Asep. Agent {userName} !!!")
     monsterList(userId, dataMonster)
     print(f"{jumlahPilihan}. Cancel")
+    displayBar("UPGRADE PRICE")
     print(
-"""<============> UPGRADE PRICE <============>
-1. Level 1 -> Level 2: 300 OC
+"""1. Level 1 -> Level 2: 300 OC
 2. Level 2 -> Level 3: 500 OC
 3. Level 3 -> Level 4: 800 OC
 4. Level 4 -> Level 5: 1000 OC""")
